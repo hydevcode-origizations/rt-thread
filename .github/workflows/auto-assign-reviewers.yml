@@ -13,6 +13,7 @@
 
 
 
+
 name: Auto Review Assistant
 
 on:
@@ -216,6 +217,6 @@ jobs:
               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
           echo "Creating new comment"
             response=$(curl -s -X POST \
-              -H "Authorization: Bearer ${{ secrets.TOKEN }}" \
+              -H "Authorization: Bearer ${{ vars.TOKEN }}" \
               -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
