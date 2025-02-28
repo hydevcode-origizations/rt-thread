@@ -12,6 +12,7 @@
 # Script Function Description: Assign PR reviews based on the MAINTAINERS list.asdasasassaasss
 
 
+
 name: Auto Review Assistant
 
 on:
@@ -218,8 +219,3 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.TOKEN }}" \
               -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
               "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
-      - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
-        with:
-          message: "欢迎提交PR！我们的团队将会尽快审查。"
-          GITHUB_TOKEN: ${{ github.token }}
