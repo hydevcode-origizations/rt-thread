@@ -25,13 +25,13 @@ jobs:
             var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "pr"
             })[0];
-            
+            const artifact_id=matchArtifact.id;
+            console.log(`Found artifact id: ${artifact_id}`)
             var download = await github.actions.downloadArtifact({
                owner: context.repo.owner,
                repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-               auth: ${{ secrets.GITHUB_TOKEN }}
+               artifact_id: artifact_id,
+               archive_format: 'zip'
             });
             var fs = require('fs');
             fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
