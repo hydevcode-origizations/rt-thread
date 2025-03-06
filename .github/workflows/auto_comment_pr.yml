@@ -3,6 +3,7 @@ name: Comment on the pull request
 # read-write repo token
 # access to secrets
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Auto Review Assistant"]
     types:
@@ -33,18 +34,19 @@ jobs:
             #    artifact_id: artifact_id,
             #    archive_format: 'zip'
             # });
-            const { Octokit } = require("@octokit/rest");
-            const octokit = new Octokit({
-              auth: ${{ secrets.GITHUB_TOKEN }},
-            });
-            const { data: artifact } = await octokit.rest.actions.downloadArtifact({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              artifact_id: artifact_id,
-              archive_format: "zip",
-            });
-            var fs = require('fs');
-            fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
+            
+            # const { Octokit } = require("@octokit/rest");
+            # const octokit = new Octokit({
+            #   auth: ${{ secrets.GITHUB_TOKEN }},
+            # });
+            # const { data: artifact } = await octokit.rest.actions.downloadArtifact({
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   artifact_id: artifact_id,
+            #   archive_format: "zip",
+            # });
+            # var fs = require('fs');
+            # fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
       - run: unzip pr.zip
           
       # - name: Download artifact
