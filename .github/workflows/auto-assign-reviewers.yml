@@ -165,11 +165,13 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.issues.createComment({
+            var fs = require('fs');
+            var issue = fs.readFileSync('./review_data.md');
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: /home/runner/work/rt-thread/rt-thread/review_data.md
+              body: issue
             })
       # - name: Post/Update comment
       #   id: post_comment
