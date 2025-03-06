@@ -74,7 +74,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.issues.createComment({
+            github.issues.createComment({
               issue_number: 9,
               owner: context.repo.owner,
               repo: context.repo.repo,
