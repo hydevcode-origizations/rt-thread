@@ -167,7 +167,7 @@ jobs:
           echo ${{ github.event.number }} > ./pr/NR
           mv ../review_data.md ./pr/
           ls
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: pr
           path: pr/
