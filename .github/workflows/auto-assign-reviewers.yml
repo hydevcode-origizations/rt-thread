@@ -165,7 +165,7 @@ jobs:
         run: |
           mkdir -p ./pr
           echo ${{ github.event.number }} > ./pr/NR
-          mv ../review_data.md ./pr/
+          mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
           ls
       - uses: actions/upload-artifact@v4
         with:
