@@ -77,7 +77,7 @@ jobs:
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./NR'));
             await github.issues.createComment({
-              issue_number: issue_number,
+              issue_number: 9,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Everything is OK. Thank you for the PR!'
