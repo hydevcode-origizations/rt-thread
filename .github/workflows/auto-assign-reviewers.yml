@@ -169,7 +169,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '$(cat /home/runner/work/rt-thread/rt-thread/review_data.md)'
+              body: $(cat /home/runner/work/rt-thread/rt-thread/review_data.md)
             })
       # - name: Post/Update comment
       #   id: post_comment
