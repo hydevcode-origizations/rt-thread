@@ -13,21 +13,21 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Download artifact'
-        uses: actions/github-script@v3.1.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            var artifacts = await github.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: ${{github.event.workflow_run.id }},
-            });
-            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "pr"
-            })[0];
-            const artifact_id=matchArtifact.id;
-            console.log(`Found artifact id: ${artifact_id}`)
+      # - name: 'Download artifact'
+      #   uses: actions/github-script@v3.1.0
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       var artifacts = await github.actions.listWorkflowRunArtifacts({
+      #          owner: context.repo.owner,
+      #          repo: context.repo.repo,
+      #          run_id: ${{github.event.workflow_run.id }},
+      #       });
+      #       var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+      #         return artifact.name == "pr"
+      #       })[0];
+      #       const artifact_id=matchArtifact.id;
+      #       console.log(`Found artifact id: ${artifact_id}`)
             # var download = await github.actions.downloadArtifact({
             #    owner: context.repo.owner,
             #    repo: context.repo.repo,
@@ -47,7 +47,7 @@ jobs:
             # });
             # var fs = require('fs');
             # fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
-      - run: unzip pr.zip
+      # - run: unzip pr.zip
           
       # - name: Download artifact
       #   uses: actions/download-artifact@v4
