@@ -161,16 +161,17 @@ jobs:
             echo "> ℹ️ **Refresh CI status operation requires repository Write permission.**"
           } > review_data.md
           pwd
-      - name: Save PR number
-        run: |
-          mkdir -p ./pr
-          echo ${{ github.event.number }} > ./pr/NR
-          mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
-          ls
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr
-          path: pr/
+      # - name: Save PR number
+      #   run: |
+      #     mkdir -p ./pr
+      #     echo ${{ github.event.number }} > ./pr/NR
+      #     mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
+      #     ls
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: pr
+      #     path: pr/
+      
       # - name: Post/Update comment
       #   id: post_comment
       #   run: |
