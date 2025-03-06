@@ -1,6 +1,6 @@
 name: Comment on the pull request
 
-# read-write repo token
+# read-write repo tokenasd
 # access to secrets
 on:
   workflow_run:
