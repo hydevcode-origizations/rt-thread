@@ -27,17 +27,26 @@ jobs:
             })[0];
             const artifact_id=matchArtifact.id;
             console.log(`Found artifact id: ${artifact_id}`)
-            var download = await github.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: artifact_id,
-               archive_format: 'zip'
+            # var download = await github.actions.downloadArtifact({
+            #    owner: context.repo.owner,
+            #    repo: context.repo.repo,
+            #    artifact_id: artifact_id,
+            #    archive_format: 'zip'
+            # });
+            const { Octokit } = require("@octokit/rest");
+            const octokit = new Octokit({
+              auth: ${{ secrets.GITHUB_TOKEN }},
+            });
+            const { data: artifact } = await octokit.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact_id,
+              archive_format: "zip",
             });
             var fs = require('fs');
             fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
       - run: unzip pr.zip
-      
-      
+          
       # - name: Download artifact
       #   uses: actions/download-artifact@v4
       #   with:
