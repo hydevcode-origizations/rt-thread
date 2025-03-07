@@ -167,10 +167,11 @@ jobs:
           echo ${{ github.event.number }} > ./pr/NR
           mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
           ls
+          tar -cvf pr.tar ./pr
       - uses: actions/upload-artifact@v4
         with:
-          name: pr.zip
-          path: pr/
+          name: pr
+          path: pr.tar
       
       # - name: Post/Update comment
       #   id: post_comment
