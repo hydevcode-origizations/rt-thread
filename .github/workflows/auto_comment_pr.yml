@@ -56,7 +56,10 @@ jobs:
           run-id: ${{github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify
-        run: unzip pr.zip
+        run: |
+          ls
+          unzip /home/runner/work/rt-thread/rt-thread/pr.zip
+          ls
       # - name: 'Comment on PR'
       #   uses: actions/github-script@v3
       #   with:
