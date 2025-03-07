@@ -77,7 +77,7 @@ jobs:
           script: |
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./pr/NR'));
-            var issue_content = fs.readFileSync('./pr/review_data.md');
+            const issue_content = fs.readFileSync('./pr/review_data.md', 'utf-8');
             console.log(issue_content);
             github.rest.issues.createComment({
               issue_number: issue_number,
