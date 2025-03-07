@@ -161,16 +161,16 @@ jobs:
             echo "> ℹ️ **Refresh CI status operation requires repository Write permission.**"
           } > review_data.md
           pwd
-      # - name: Save PR number
-      #   run: |
-      #     mkdir -p ./pr
-      #     echo ${{ github.event.number }} > ./pr/NR
-      #     mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
-      #     ls
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: pr
-      #     path: pr/
+      - name: Save PR number
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
+          mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
+          ls
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr
+          path: pr/
       
       # - name: Post/Update comment
       #   id: post_comment
@@ -197,25 +197,25 @@ jobs:
       #         -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
       #         "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
       #     fi
-      - name: 'Comment on PR'
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: ${{ github.event.pull_request.number }},
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Everything is OK. Thank you for the PR!'
-            })
-      - name: Create comment
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: 1
-          body: |
-            This is a multi-line test comment
-            - With GitHub **Markdown** :sparkles:
-            - Created by [create-or-update-comment][1]
+      # - name: 'Comment on PR'
+      #   uses: actions/github-script@v7
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       github.rest.issues.createComment({
+      #         issue_number: ${{ github.event.pull_request.number }},
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: 'Everything is OK. Thank you for the PR!'
+      #       })
+      # - name: Create comment
+      #   uses: peter-evans/create-or-update-comment@v4
+      #   with:
+      #     issue-number: 1
+      #     body: |
+      #       This is a multi-line test comment
+      #       - With GitHub **Markdown** :sparkles:
+      #       - Created by [create-or-update-comment][1]
 
-            [1]: https://github.com/peter-evans/create-or-update-comment
-          reactions: '+1'
+      #       [1]: https://github.com/peter-evans/create-or-update-comment
+      #     reactions: '+1'
