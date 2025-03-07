@@ -56,7 +56,7 @@ jobs:
           run-id: ${{github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify
-        run: ls
+        run: unzip pr.zip
       # - name: 'Comment on PR'
       #   uses: actions/github-script@v3
       #   with:
@@ -75,8 +75,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            var fs = require('fs');
+            var issue_number = Number(fs.readFileSync('./NR'));
             github.rest.issues.createComment({
-              issue_number: 9,
+              issue_number: issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Everything is OK. Thank you for the PR!'
