@@ -77,11 +77,11 @@ jobs:
           script: |
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./pr/NR'));
-            var issue_content = Number(fs.readFileSync('./pr/review_data.md'));
+            var issue_content = fs.readFileSync('./pr/review_data.md');
             console.log(issue_content);
             github.rest.issues.createComment({
               issue_number: issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "hello world"
+              body: issue_content
             })
