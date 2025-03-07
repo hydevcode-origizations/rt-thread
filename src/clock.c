@@ -16,7 +16,7 @@
  * 2020-12-29     Meco Man     implement rt_tick_get_millisecond()
  * 2021-06-01     Meco Man     add critical section projection for rt_tick_increase()
  * 2023-09-15     xqyjlj       perf rt_hw_interrupt_disable/enable
- * 2023-10-16     RiceChen     fix: only the main core detection rt_timer_check(), in SMP mode
+ * 2023-10-16     RiceChen     fix: only the main core detection rt_timer_check(), in SMP mode 
  */
 
 #include <rthw.h>
