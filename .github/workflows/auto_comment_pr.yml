@@ -48,11 +48,11 @@ jobs:
             # var fs = require('fs');
             # fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
       # - run: unzip pr.zip
-          
+          # ${{github.event.workflow_run.id }}
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          run-id: ${{github.event.workflow_run.id }}
+          run-id: 13713017966
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify
         run: |
@@ -78,9 +78,10 @@ jobs:
             var fs = require('fs');
             var issue_number = Number(fs.readFileSync('./pr/NR'));
             var issue_content = Number(fs.readFileSync('./pr/review_data.md'));
+            console.log(issue_content);
             github.rest.issues.createComment({
               issue_number: issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: issue_content
+              body: "hello world"
             })
