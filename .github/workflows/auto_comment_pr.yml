@@ -4,10 +4,10 @@ name: Comment on the pull request
 # access to secrets
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Auto Review Assistant"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Auto Review Assistant"]
+    # types:
+    #   - completed
 
 jobs:
   upload:
