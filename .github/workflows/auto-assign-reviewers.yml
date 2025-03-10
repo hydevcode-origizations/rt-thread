@@ -134,11 +134,11 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
           jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
         
-          echo "$existing_comment"
+          echo "$existing_comment"| base64 -d
           # 获取历史已通知的审核者（从现有评论中提取）
           if [[ -n "$existing_comment" ]]; then
             notified_users=$(echo "$existing_comment" | base64 -d | jq -r '.body' | 
-              grep -oP '<!-- NOTIFIED_REVIEWERS: \K[^ ]+' | tr ',' ' ')
+              grep -oP '<!-- NOTIFIED_REVIEWERS: \K[^>]+' )
           else
             notified_users=""
           fi
@@ -146,7 +146,10 @@ jobs:
           echo "$notified_users"
           # 生成待通知的新审核者列表
           current_reviewers=$(cat unique_reviewers.txt | xargs)
-          
+          echo "-------------------------------------------------"
+          cat unique_reviewers.txt
+          echo "-------------------------------------------------"
+          echo "$current_reviewers"
           # 对比差异：新增审核者需要@，已有审核者去@
           new_reviewers=()
           existing_reviewers=()
