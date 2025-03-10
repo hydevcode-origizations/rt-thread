@@ -39,6 +39,8 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
             jq -r '.[].filename')  # 使用 jq 提取文件名
           echo "$changed_files" | grep -v '^MAINTAINERS$' > changed_files.txt
+          #所有变更的文件
+          echo "$changed_files" | grep -v '^MAINTAINERS$'
       - name: Parse MAINTAINERS file
         id: parse_maintainer
         run: |
@@ -61,6 +63,8 @@ jobs:
               print tag "|" path "|" github_ids
             }
           ' MAINTAINERS > tag_data.csv
+          #tag_data.csv包含所有人维护者
+          cat tag_data.csv
 
       - name: Generate reviewers list
         id: generate_reviewers
@@ -75,10 +79,11 @@ jobs:
           done < tag_data.csv
           # 去重处理
           awk 'NF && !seen[$0]++' triggered_reviewers.txt > unique_reviewers.txt
-
+          cat unique_reviewers.txt
       - name: Get approval status
         id: get_approval
         run: |
+          
           #主要用于判断是否审查
           current_time=$(date -u +"%Y-%m-%d %H:%M UTC")
           reviewers=$(cat unique_reviewers.txt | tr '\n' '|')
@@ -87,6 +92,8 @@ jobs:
           comments=$(curl -s \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
 
+          echo comments
+          echo "-------------------------------------------------"
           echo '#!/bin/bash' > approval_data.sh
           echo 'declare -A approvals=()' >> approval_data.sh
           
@@ -104,6 +111,7 @@ jobs:
           # 加载审查数据并生成状态报告
           chmod +x approval_data.sh
           source ./approval_data.sh
+          cat approval_data.sh
 
           {
             echo "---"
@@ -126,6 +134,7 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
           jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
         
+          echo existing_comment
           # 获取历史已通知的审核者（从现有评论中提取）
           if [[ -n "$existing_comment" ]]; then
             notified_users=$(echo "$existing_comment" | base64 -d | jq -r '.body' | 
@@ -133,7 +142,8 @@ jobs:
           else
             notified_users=""
           fi
-
+          echo "-------------------------------------------------"
+          echo notified_users
           # 生成待通知的新审核者列表
           current_reviewers=$(cat unique_reviewers.txt | xargs)
           
@@ -147,6 +157,11 @@ jobs:
               new_reviewers+=("$user")
             fi
           done
+
+          echo "-------------------------------------------------"
+          echo new_reviewers
+          echo "-------------------------------------------------"
+          echo existing_reviewers
           current_time=$(date -u +"%Y-%m-%d %H:%M UTC")
           {
             echo "<!-- NOTIFIED_REVIEWERS: ${new_reviewers[*]} ${existing_reviewers[*]} -->"
@@ -198,7 +213,8 @@ jobs:
             echo "> ℹ️ **刷新CI状态操作需要具备仓库写入权限。**"
             echo "> ℹ️ **Refresh CI status operation requires repository Write permission.**"
           } > review_data.md
-          pwd
+          echo "-------------------------------------------------"
+          cat review_data.md
       # - name: Save PR number
       #   run: |
       #     mkdir -p ./pr
