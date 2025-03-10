@@ -22,7 +22,7 @@ jobs:
   assign-reviewers:
     runs-on: ubuntu-22.04
     permissions:
-      issues: read
+      issues: write
       pull-requests: read
       contents: read
     steps:
@@ -92,7 +92,7 @@ jobs:
           comments=$(curl -s \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
 
-          echo comments
+          echo "$comments"
           echo "-------------------------------------------------"
           echo '#!/bin/bash' > approval_data.sh
           echo 'declare -A approvals=()' >> approval_data.sh
@@ -134,7 +134,7 @@ jobs:
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
           jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
         
-          echo existing_comment
+          echo "$existing_comment"
           # 获取历史已通知的审核者（从现有评论中提取）
           if [[ -n "$existing_comment" ]]; then
             notified_users=$(echo "$existing_comment" | base64 -d | jq -r '.body' | 
@@ -143,7 +143,7 @@ jobs:
             notified_users=""
           fi
           echo "-------------------------------------------------"
-          echo notified_users
+          echo "$notified_users"
           # 生成待通知的新审核者列表
           current_reviewers=$(cat unique_reviewers.txt | xargs)
           
@@ -159,9 +159,9 @@ jobs:
           done
 
           echo "-------------------------------------------------"
-          echo new_reviewers
+          echo "$new_reviewers"
           echo "-------------------------------------------------"
-          echo existing_reviewers
+          echo "$existing_reviewers"
           current_time=$(date -u +"%Y-%m-%d %H:%M UTC")
           {
             echo "<!-- NOTIFIED_REVIEWERS: ${new_reviewers[*]} ${existing_reviewers[*]} -->"
