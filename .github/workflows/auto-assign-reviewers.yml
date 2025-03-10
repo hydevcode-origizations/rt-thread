@@ -15,7 +15,6 @@ name: Auto Review Assistant
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
   issue_comment:
     types: [created]
 
@@ -23,12 +22,12 @@ jobs:
   assign-reviewers:
     runs-on: ubuntu-22.04
     permissions:
-      issues: write
+      issues: read
       pull-requests: read
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: Get changed files
@@ -80,12 +79,12 @@ jobs:
       - name: Get approval status
         id: get_approval
         run: |
+          #主要用于判断是否审查
           current_time=$(date -u +"%Y-%m-%d %H:%M UTC")
           reviewers=$(cat unique_reviewers.txt | tr '\n' '|')
           
           # 获取 PR 的所有评论
           comments=$(curl -s \
-            -H "Authorization: Bearer ${{ github.token }}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
 
           echo '#!/bin/bash' > approval_data.sh
@@ -122,8 +121,36 @@ jobs:
       - name: Generate review data
         id: generate_review
         run: |
+          existing_comment=$(curl -s \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
+          jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
+        
+          # 获取历史已通知的审核者（从现有评论中提取）
+          if [[ -n "$existing_comment" ]]; then
+            notified_users=$(echo "$existing_comment" | base64 -d | jq -r '.body' | 
+              grep -oP '<!-- NOTIFIED_REVIEWERS: \K[^ ]+' | tr ',' ' ')
+          else
+            notified_users=""
+          fi
+
+          # 生成待通知的新审核者列表
+          current_reviewers=$(cat unique_reviewers.txt | xargs)
+          
+          # 对比差异：新增审核者需要@，已有审核者去@
+          new_reviewers=()
+          existing_reviewers=()
+          for user in $current_reviewers; do
+            if [[ " $notified_users " =~ " $user " ]]; then
+              existing_reviewers+=("${user#@}")  # 去掉@前缀
+            else
+              new_reviewers+=("$user")
+            fi
+          done
           current_time=$(date -u +"%Y-%m-%d %H:%M UTC")
           {
+            echo "<!-- NOTIFIED_REVIEWERS: ${new_reviewers[*]} ${existing_reviewers[*]} -->"
+
             # 生成审查分配信息
             echo "## 📌 Code Review Assignment"
             echo ""
@@ -132,6 +159,17 @@ jobs:
               if grep -qE "^$path(/|$)" changed_files.txt; then
                 echo "### 🏷️ Tag: $tag"
                 echo "**Path:** \`$path\`  "
+
+                # 处理评审者显示逻辑
+                formatted_reviewers=""
+                for r in $reviewers; do
+                  if [[ " ${new_reviewers[@]} " =~ " $r " ]]; then
+                    formatted_reviewers+="$r "       # 新审核者带@
+                  else
+                    formatted_reviewers+="${r#@} "   # 已有审核者去@
+                  fi
+                done
+
                 echo "**Reviewers:** $reviewers  "
                 echo "<details>"
                 echo "<summary><b>Changed Files</b> (Click to expand)</summary>"
@@ -161,62 +199,40 @@ jobs:
             echo "> ℹ️ **Refresh CI status operation requires repository Write permission.**"
           } > review_data.md
           pwd
-      - name: Save PR number
-        run: |
-          mkdir -p ./pr
-          echo ${{ github.event.number }} > ./pr/NR
-          mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
-          ls
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr
-          path: pr
-      
-      # - name: Post/Update comment
-      #   id: post_comment
+      # - name: Save PR number
       #   run: |
-      #     # 查找现有的 bot 评论
-      #     existing_comment=$(curl -s \
-      #       -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-      #       "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
-      #       jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
-          
-      #     if [[ -n "$existing_comment" ]]; then
-      #       # 更新现有评论
-      #       comment_id=$(echo "$existing_comment" | head -1 | base64 -d | jq -r .id)
-      #       echo "Updating existing comment $comment_id"
-      #       response=$(curl -s -X PATCH \
-      #         -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-      #         -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
-      #         "https://api.github.com/repos/${{ github.repository }}/issues/comments/$comment_id")
-      #     else
-      #       # 创建新评论
-      #       echo "Creating new comment"
-      #       response=$(curl -s -X POST \
-      #         -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-      #         -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
-      #         "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
-      #     fi
-      # - name: 'Comment on PR'
-      #   uses: actions/github-script@v7
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       github.rest.issues.createComment({
-      #         issue_number: ${{ github.event.pull_request.number }},
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: 'Everything is OK. Thank you for the PR!'
-      #       })
-      # - name: Create comment
-      #   uses: peter-evans/create-or-update-comment@v4
-      #   with:
-      #     issue-number: 1
-      #     body: |
-      #       This is a multi-line test comment
-      #       - With GitHub **Markdown** :sparkles:
-      #       - Created by [create-or-update-comment][1]
+      #     mkdir -p ./pr
+      #     echo ${{ github.event.number }} > ./pr/NR
+      #     mv /home/runner/work/rt-thread/rt-thread/review_data.md ./pr/
+      #     ls
 
-      #       [1]: https://github.com/peter-evans/create-or-update-comment
-      #     reactions: '+1'
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: pr
+      #     path: pr
+      
+      - name: Post/Update comment
+        id: post_comment
+        run: |
+          # 查找现有的 bot 评论
+          existing_comment=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" | \
+            jq -r '.[] | select(.user.login == "github-actions[bot]") | {id: .id, body: .body} | @base64')
+          
+          if [[ -n "$existing_comment" ]]; then
+            # 更新现有评论
+            comment_id=$(echo "$existing_comment" | head -1 | base64 -d | jq -r .id)
+            echo "Updating existing comment $comment_id"
+            response=$(curl -s -X PATCH \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/comments/$comment_id")
+          else
+            # 创建新评论
+            echo "Creating new comment"
+            response=$(curl -s -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -d "$(jq -n --arg body "$(cat review_data.md)" '{body: $body}')" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments")
+          fi
