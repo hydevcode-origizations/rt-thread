@@ -502,6 +502,17 @@ jobs:
           /opt/i386-unknown-elf_for_x86_64-pc-linux-gnu/bin/i386-unknown-elf-gcc --version
           echo "RTT_EXEC_PATH=/opt/i386-unknown-elf_for_x86_64-pc-linux-gnu/bin" >> $GITHUB_ENV
 
+
+#查找当前修改文件的一个bsp列表
+      - name: Bsp Scons Compile
+        if: github.event_name == 'pull_request'
+        run: |
+          changed_files=$(curl -s \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.extract-pr.outputs.PR_NUMBER }}/files" | \
+            jq -r '.[].filename') 
+          echo "$changed_files"
+
+          #判断当前bsp是否重合,重合则不编译,只能在python中操作
       - name: Bsp Scons Compile
         if: ${{ success() }}
         shell: bash
@@ -509,13 +520,17 @@ jobs:
           RTT_BSP: ${{ matrix.legs.RTT_BSP }}
           RTT_TOOL_CHAIN: ${{ matrix.legs.RTT_TOOL_CHAIN }}
           SRTT_BSP: ${{ join(matrix.legs.SUB_RTT_BSP, ',') }}
-        run: |
-          source ~/.env/env.sh
-          python tools/ci/bsp_buildings.py
 
-      - name: Post failure comment
-        if: failure()
         run: |
-          curl -X POST -H "Authorization: token ${{ secrets.RTTHREAD_GITHUB_TOKEN }}" \
-          -d '{"body":"@${{ github.actor }}, Thank you for your contribution, but there was an error with the action. Could you please help check the BSP compilation issue? Thank you."}' \
-          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          echo "$RTT_BSP"
+          echo "$SRTT_BSP"
+          # source ~/.env/env.sh
+          # python tools/ci/bsp_buildings.py
+
+
+      # - name: Post failure comment
+      #   if: failure()
+      #   run: |
+      #     curl -X POST -H "Authorization: token ${{ secrets.RTTHREAD_GITHUB_TOKEN }}" \
+      #     -d '{"body":"@${{ github.actor }}, Thank you for your contribution, but there was an error with the action. Could you please help check the BSP compilation issue? Thank you."}' \
+      #     "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
