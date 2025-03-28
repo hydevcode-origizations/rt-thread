@@ -32,6 +32,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     name: ${{ matrix.legs.RTT_BSP }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -507,7 +508,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           changed_files=$(curl -s \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.extract-pr.outputs.PR_NUMBER }}/files" | \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
             jq -r '.[].filename') 
           echo "$changed_files"
 
