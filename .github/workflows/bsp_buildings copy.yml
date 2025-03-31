@@ -29,6 +29,8 @@ permissions:
 jobs:
   generate-matrix:
     runs-on: ubuntu-22.04
+    outputs:
+      filtered-matrix: ${{ steps.filter.outputs.filtered }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -95,7 +97,7 @@ jobs:
           fi
           echo "-----------------------"
           echo "${filtered_matrix}"
-
+          echo "filtered_matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
           # for r in "$prefix"; do
           #   FILTER_CONDITION='.legs[] | select(.SUB_RTT_BSP | contains("stm32"))'
           # # 定义过滤条件（示例：保留包含 "stm32" 的条目）
@@ -106,12 +108,12 @@ jobs:
           # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-22.04
-    name: ${{ steps.filter.outputs.matrix.legs.RTT_BSP }}
+    name: ${{ needs.generate-matrix.outputs.filtered-matrix.legs.RTT_BSP }}
     # if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
       matrix:
-       leg: ${{ fromJson(needs.generate-matrix.outputs.filtered-matrix).legs }}
+       leg: ${{ needs.generate-matrix.outputs.filtered-matrix }}
     steps:
       # - uses: actions/checkout@v4
       # - name: Set up Python
