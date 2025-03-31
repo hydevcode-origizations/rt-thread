@@ -34,12 +34,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: master
-          sparse-checkout: .github/ALL_BSP_COMPILE.yml
+          sparse-checkout: .github/ALL_BSP_COMPILE.json
           persist-credentials: false
       - name: Read matrix config
         id: read-config
         run: |
-          echo "raw_matrix=$(cat ALL_BSP_COMPILE.json)" >> $GITHUB_OUTPUT
+          echo "raw_matrix=$(cat .github/ALL_BSP_COMPILE.json)" >> $GITHUB_OUTPUT
 
       - name: Get changed files
         id: changed_files
@@ -60,7 +60,7 @@ jobs:
             fi
           done
           if [[ $has_bsp == true ]]; then
-            changed_files=$(echo "${changed_files}| cut -d'/' -f2 | sort -u)
+            changed_files=$(echo "${changed_files}"| cut -d'/' -f2 | sort -u)
             echo "CHANGED_FILES=${changed_files}" >> $GITHUB_OUTPUT
           fi
 
