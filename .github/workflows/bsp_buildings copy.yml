@@ -97,7 +97,7 @@ jobs:
           fi
           echo "-----------------------"
           echo "${filtered_matrix}"
-          echo "filtered_matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
+          echo "filtered_matrix='${filtered_matrix}'" >> $GITHUB_OUTPUT
 
 
 
