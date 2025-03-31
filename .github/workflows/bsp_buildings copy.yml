@@ -80,20 +80,22 @@ jobs:
 
           CHANGED_FILES="${{ steps.changed_files.outputs.CHANGED_FILES }}"
 
-          filtered_matrix=""
+          filtered_matrix="${filtered_matrix}"
           if [[ "$CHANGED_FILES" == "" ]]; then
               FILTER_CONDITION='.legs[]
               filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "$raw_matrix")
+              echo "全部编译"
           else
             CONDITIONS=$(echo "$CHANGED_FILES" | awk '{for (i=1; i<=NF; i++) printf "contains(\"%s\") or ", $i}')
             CONDITIONS=${CONDITIONS% or }
+            echo "$CONDITIONS"
             FILTER_CONDITION=".legs[] | select(any(.SUB_RTT_BSP[]; $CONDITIONS))"
             filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "$raw_matrix")
-            
+            echo "部分编译"
           fi
           echo "-----------------------"
           echo "${filtered_matrix}"
-          
+
           # for r in "$prefix"; do
           #   FILTER_CONDITION='.legs[] | select(.SUB_RTT_BSP | contains("stm32"))'
           # # 定义过滤条件（示例：保留包含 "stm32" 的条目）
