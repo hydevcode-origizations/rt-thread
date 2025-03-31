@@ -115,7 +115,7 @@ jobs:
     # if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
-      matrix: ${{ needs.generate-matrix.outputs.filtered_matrix }}
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.filtered_matrix) }}
     steps:
       # - uses: actions/checkout@v4
       # - name: Set up Python
