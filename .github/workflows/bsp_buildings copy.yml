@@ -39,10 +39,7 @@ jobs:
       - name: Read matrix config
         id: read-config
         run: |
-          # 将 YAML 转换为 JSON（需要安装 yq）
-          sudo apt-get install -y jq
-          yq -o=json .github/ALL_BSP_COMPILE.yml > matrix.json
-          echo "raw_matrix=$(cat matrix.json)" >> $GITHUB_OUTPUT
+          echo "raw_matrix=$(cat ALL_BSP_COMPILE.json)" >> $GITHUB_OUTPUT
 
       - name: Get changed files
         id: changed_files
