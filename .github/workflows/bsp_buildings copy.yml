@@ -39,12 +39,16 @@ jobs:
       - name: Read matrix config
         id: read-config
         run: |
-          echo "raw_matrix=$(cat .github/ALL_BSP_COMPILE.json)" >> $GITHUB_OUTPUT
+          # 将 JSON 文件内容进行 Base64 编码
+          raw_matrix_base64=$(base64 -w 0 .github/ALL_BSP_COMPILE.json)
 
+          # 写入到 GITHUB_OUTPUT
+          echo "raw_matrix=$raw_matrix_base64" >> $GITHUB_OUTPUT
       - name: Get changed files
         id: changed_files
         if: github.event_name == 'pull_request'
         run: |
+
           changed_files=$(curl -s \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
             jq -r '.[].filename') 
@@ -69,20 +73,27 @@ jobs:
         id: filter
         run: |
 
+          # 进行 Base64 解码并还原为 JSON
+          raw_matrix=$(echo "${{ steps.read-config.outputs.raw_matrix }}" | base64 --decode)
+          # 打印或处理 JSON 数据
+          echo "$raw_matrix"
+
           CHANGED_FILES="${{ steps.changed_files.outputs.CHANGED_FILES }}"
 
-          filtered_matrix=${{ steps.read-config.outputs.raw_matrix }}
+          filtered_matrix=""
           if [[ "$CHANGED_FILES" == "" ]]; then
               FILTER_CONDITION='.legs[]
-              filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "${{ steps.read-config.outputs.raw_matrix }}")
+              filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "$raw_matrix")
           else
             CONDITIONS=$(echo "$CHANGED_FILES" | awk '{for (i=1; i<=NF; i++) printf "contains(\"%s\") or ", $i}')
             CONDITIONS=${CONDITIONS% or }
             FILTER_CONDITION=".legs[] | select(any(.SUB_RTT_BSP[]; $CONDITIONS))"
-            filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "${{ steps.read-config.outputs.raw_matrix }}")
+            filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "$raw_matrix")
             
           fi
-          echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
+          echo "-----------------------"
+          echo "${filtered_matrix}"
+          
           # for r in "$prefix"; do
           #   FILTER_CONDITION='.legs[] | select(.SUB_RTT_BSP | contains("stm32"))'
           # # 定义过滤条件（示例：保留包含 "stm32" 的条目）
