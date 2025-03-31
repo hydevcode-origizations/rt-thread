@@ -99,16 +99,6 @@ jobs:
           echo "${filtered_matrix}"
           echo "filtered_matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
 
-
-
-          # for r in "$prefix"; do
-          #   FILTER_CONDITION='.legs[] | select(.SUB_RTT_BSP | contains("stm32"))'
-          # # 定义过滤条件（示例：保留包含 "stm32" 的条目）
-          # FILTER_CONDITION='.legs[] | select(.SUB_RTT_BSP | contains("stm32"))'
-
-          # # 应用过滤条件
-          # filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "${{ steps.read-config.outputs.raw_matrix }}")
-          # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-22.04
     needs: generate-matrix
