@@ -104,15 +104,15 @@ jobs:
           # # 应用过滤条件
           # filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "${{ steps.read-config.outputs.raw_matrix }}")
           # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
-  # build:
-  #   runs-on: ubuntu-22.04
-  #   name: ${{ matrix.legs.RTT_BSP }}
-  #   if: github.repository_owner == 'RT-Thread'
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #      leg: ${{ fromJson(needs.generate-matrix.outputs.filtered-matrix).legs }}
-  #   steps:
+  build:
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.legs.RTT_BSP }}
+    # if: github.repository_owner == 'RT-Thread'
+    strategy:
+      fail-fast: false
+      matrix:
+       leg: ${{ fromJson(needs.generate-matrix.outputs.filtered-matrix).legs }}
+    steps:
       # - uses: actions/checkout@v4
       # - name: Set up Python
       #   uses: actions/setup-python@main
@@ -220,20 +220,20 @@ jobs:
 
 
           #判断当前bsp是否重合,重合则不编译,只能在python中操作
-      # - name: Bsp Scons Compile Filter
-      #   if: ${{ success() && steps.changed_files.outputs.CHANGED_FILES != ''}}
-      #   shell: bash
-      #   env:
-      #     RTT_BSP: ${{ matrix.legs.RTT_BSP }}
-      #     RTT_TOOL_CHAIN: ${{ matrix.legs.RTT_TOOL_CHAIN }}
-      #     SRTT_BSP: ${{ join(matrix.legs.SUB_RTT_BSP, ',') }}
-      #     RTT_BSP_FILTER: ${{ steps.changed_files.outputs.CHANGED_FILES }}
-      #   run: |
-      #     echo "$RTT_BSP"
-      #     echo "$SRTT_BSP"
-      #     echo "$RTT_BSP_FILTER"
-      #     # source ~/.env/env.sh
-      #     # python tools/ci/bsp_buildings.py
+      - name: Bsp Scons Compile Filter
+        if: ${{ success() }}
+        shell: bash
+        env:
+          RTT_BSP: ${{ matrix.legs.RTT_BSP }}
+          RTT_TOOL_CHAIN: ${{ matrix.legs.RTT_TOOL_CHAIN }}
+          SRTT_BSP: ${{ join(matrix.legs.SUB_RTT_BSP, ',') }}
+          # RTT_BSP_FILTER: ${{ steps.changed_files.outputs.CHANGED_FILES }}
+        run: |
+          echo "$RTT_BSP"
+          echo "$SRTT_BSP"
+          # echo "$RTT_BSP_FILTER"
+          # source ~/.env/env.sh
+          # python tools/ci/bsp_buildings.py
 
       # - name: Bsp Scons Compile
       #   if: ${{ success() && steps.changed_files.outputs.CHANGED_FILES == ''}}
