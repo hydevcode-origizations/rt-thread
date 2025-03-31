@@ -112,7 +112,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     needs: generate-matrix
-    name: ${{ needs.generate-matrix.outputs.filtered_matrix.legs.RTT_BSP }}
+    name: ${{ fromJson(needs.generate-matrix.outputs.filtered_matrix).legs.RTT_BSP }}
     # if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
