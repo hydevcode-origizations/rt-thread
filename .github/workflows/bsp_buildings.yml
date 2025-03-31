@@ -518,7 +518,7 @@ jobs:
 
           #判断是否有bsp以外的文件被修改，如果有，则不考虑单独编译
           for r in $prefix; do
-            if [[! " ${r} " == " bsp " ]]; then
+            if [[ ! " ${r} " == " bsp " ]]; then
                 echo "有bsp之外的文件"
             else
                 echo "只有bsp"
