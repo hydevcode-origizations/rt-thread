@@ -30,7 +30,7 @@ jobs:
   generate-matrix:
     runs-on: ubuntu-22.04
     outputs:
-      filtered-matrix: ${{ steps.filter.outputs.filtered_matrix }}
+      filtered_matrix: ${{ steps.filter.outputs.filtered_matrix }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -111,11 +111,11 @@ jobs:
           # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-22.04
-    name: ${{ needs.generate-matrix.outputs.filtered-matrix.legs.RTT_BSP }}
+    name: ${{ needs.generate-matrix.outputs.filtered_matrix.legs.RTT_BSP }}
     # if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
-      matrix: ${{ needs.generate-matrix.outputs.filtered-matrix }}
+      matrix: ${{ needs.generate-matrix.outputs.filtered_matrix }}
     steps:
       # - uses: actions/checkout@v4
       # - name: Set up Python
