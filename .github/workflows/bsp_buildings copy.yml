@@ -106,7 +106,7 @@ jobs:
           # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-22.04
-    name: ${{ matrix.legs.RTT_BSP }}
+    name: ${{ steps.filter.outputs.matrix.legs.RTT_BSP }}
     # if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
