@@ -97,7 +97,7 @@ jobs:
           fi
           echo "-----------------------"
           echo "${filtered_matrix}"
-          echo "filtered_matrix='${filtered_matrix}'" >> $GITHUB_OUTPUT
+          echo "filtered_matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
 
 
 
@@ -111,6 +111,7 @@ jobs:
           # echo "matrix=${filtered_matrix}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-22.04
+    needs: generate-matrix
     name: ${{ needs.generate-matrix.outputs.filtered_matrix.legs.RTT_BSP }}
     # if: github.repository_owner == 'RT-Thread'
     strategy:
