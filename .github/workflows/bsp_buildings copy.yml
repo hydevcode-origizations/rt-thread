@@ -82,7 +82,7 @@ jobs:
 
           filtered_matrix="${filtered_matrix}"
           if [[ "$CHANGED_FILES" == "" ]]; then
-              FILTER_CONDITION='.legs[]
+              FILTER_CONDITION='.legs[]'
               filtered_matrix=$(jq -c "{legs: [$FILTER_CONDITION]}" <<< "$raw_matrix")
               echo "全部编译"
           else
