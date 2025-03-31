@@ -517,17 +517,22 @@ jobs:
           echo "$prefix"
 
           #判断是否有bsp以外的文件被修改，如果有，则不考虑单独编译
+
+          has_bsp=true
           for r in "$prefix"; do
             if [[ ! "$r" == "bsp" ]]; then
-                echo "有bsp之外的文件"
-            else
-                echo "只有bsp"
-                echo "CHANGED_FILES=${changed_files}" >> $GITHUB_OUTPUT
+                has_bsp=false
+                break
             fi
           done
+          if [[ $has_bsp == true ]]; then
+            echo "CHANGED_FILES=${changed_files}" >> $GITHUB_OUTPUT
+          fi
+
+
           #判断当前bsp是否重合,重合则不编译,只能在python中操作
-      - name: Bsp Scons Compile
-        if: ${{ success() }}
+      - name: Bsp Scons Compile Filter
+        if: ${{ success() && steps.changed_files.outputs.CHANGED_FILES != ''}}
         shell: bash
         env:
           RTT_BSP: ${{ matrix.legs.RTT_BSP }}
@@ -538,6 +543,20 @@ jobs:
           echo "$RTT_BSP"
           echo "$SRTT_BSP"
           echo "$RTT_BSP_FILTER"
+          # source ~/.env/env.sh
+          # python tools/ci/bsp_buildings.py
+
+      - name: Bsp Scons Compile
+        if: ${{ success() && steps.changed_files.outputs.CHANGED_FILES == ''}}
+        shell: bash
+        env:
+          RTT_BSP: ${{ matrix.legs.RTT_BSP }}
+          RTT_TOOL_CHAIN: ${{ matrix.legs.RTT_TOOL_CHAIN }}
+          SRTT_BSP: ${{ join(matrix.legs.SUB_RTT_BSP, ',') }}
+        run: |
+          echo "$RTT_BSP"
+          echo "$SRTT_BSP"
+          echo "这是全部编译"
           # source ~/.env/env.sh
           # python tools/ci/bsp_buildings.py
 
