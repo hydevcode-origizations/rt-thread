@@ -26,12 +26,12 @@ jobs:
         PREV_TAG=$(git describe --tags --abbrev=0 --match "v*" HEAD^ 2>/dev/null || echo "")
         echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
         echo "${PREV_TAG}"
-        if [[ -n "${PREV_TAG}" ]]; then
+        if [[ -n "$PREV_TAG" ]]; then
           last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
           new_last_digit=$((last_digit + 1))
           new_version=$(echo "$version" | sed "s/[0-9]\+$/$new_last_digit/")
           echo "new_version=${new_version}" >> $GITHUB_OUTPUT
-          echo "${new_version}"
+          echo "$new_version"
         fi
     - name: Generate PR List
       id: pr_list
@@ -47,12 +47,13 @@ jobs:
           > pr_list.txt
 
         # 将 PR 列表保存为变量
+        cat pr_list.txt
         PR_NOTES=$(cat pr_list.txt)
         echo "pr_notes=${PR_NOTES}" >> $GITHUB_OUTPUT
-        echo "${PR_NOTES}"
+        echo "$PR_NOTES"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #2.统计当前到上一个版本的pr做成描述
+    #统计当前到上一个版本的pr做成描述
     - name: Create Release Notes
       run: |
         # 生成版本描述文件
