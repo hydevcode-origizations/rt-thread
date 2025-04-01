@@ -1,13 +1,17 @@
-  #流程：
-
-  #2.统计当前到上一个版本的pr做成描述
-  #3.打包仓库
-  #4.发布小版本
+#
+# Copyright (c) 2025, RT-Thread Development Team
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Change Logs:
+# Date           Author       Notes
+# 2025-04-01     Hydevcode    定时自动发送Release版本
+#
 name: Auto Release with PR Notes
 
 on:
-  push:
-    branches: [ "master" ]
+  schedule:
+    - cron:  '0 16 * 3,6,9,12 *'
   workflow_dispatch:
 
 jobs:
@@ -23,7 +27,7 @@ jobs:
       id: prev_tag
       run: |
         # 获取上一个发布的标签（排除预发布标签）
-        PREV_TAG=$(git describe --tags --abbrev=0 --match "v*" HEAD^ 2>/dev/null || echo "")
+        PREV_TAG=$(git describe --tags --abbrev=0 --match "v*" 2>/dev/null || echo "")
         echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
         echo "${PREV_TAG}"
         # 获取上一个版本的时间，如果有的话,没有就用基准时间
@@ -56,7 +60,7 @@ jobs:
     - name: Generate PR List
       id: pr_list
       run: |
-        # 获取两个标签之间的 PR 列表（使用 GitHub CLI）
+        # 获取两个标签之间的 PR 列表(使用 GitHub CLI)
         # 依靠的是上一个版本的时间
         gh pr list \
           --base master \
