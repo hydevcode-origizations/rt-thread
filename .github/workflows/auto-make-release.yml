@@ -14,10 +14,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    # - name: Checkout Code
-    #   uses: actions/checkout@v4
-    #   with:
-    #     fetch-depth: 0  # 获取完整提交历史
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 获取完整提交历史
     #获取当前已发布版本
     - name: Get Previous Tag
       id: prev_tag
