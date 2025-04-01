@@ -73,7 +73,7 @@ jobs:
         RELEASE_NOTES="## ${{ steps.prev_tag.outputs.new_version }} ($(date -I))\n\n"
         if [ -n "$PR_NOTES" ]; then
           RELEASE_NOTES+="### Merged PRs since ${{ steps.prev_tag.outputs.prev_tag }}:\n"
-          RELEASE_NOTES+="${{ PR_NOTES }}\n"
+          RELEASE_NOTES+="$PR_NOTES\n"
         else
           RELEASE_NOTES+="No new PRs since last release.\n"
         fi
