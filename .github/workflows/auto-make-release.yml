@@ -30,12 +30,13 @@ jobs:
         PREV_TIME=$(gh release list -L 1 --json publishedAt | jq '.[].publishedAt')
         echo "prev_time=${PREV_TIME}" >> $GITHUB_OUTPUT
         echo "${PREV_TIME}"
-        if [[ -n "$PREV_TIME" ]]; then
+        if [[ -z "$PREV_TIME" ]]; then
+          # 基准时间
           PREV_TIME="2025-04-01"
           echo "${PREV_TIME}"
         fi
         echo "--------------------------------"
-        if [[ -n "$PREV_TAG" ]]; then
+        if [[ -z "$PREV_TAG" ]]; then
           last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
           new_last_digit=$((last_digit + 1))
           new_version=$(echo "$version" | sed "s/[0-9]\+$/$new_last_digit/")
