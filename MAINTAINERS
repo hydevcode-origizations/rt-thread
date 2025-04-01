@@ -47,7 +47,7 @@ owners: ixd (kurisaW) <reviewer1@example.com>
 
 tag: kernel
 path: src
-owners: ixd (kurisaW) <reviewer1@example.com>, pad (Nedki-L) <reviewer2@example.com>
+owners: ixd (hydevcode) <reviewer1@example.com>,ixd (Nedki-L) <reviewer1@example.com>
 
 tag: kernel
 path: include
@@ -56,6 +56,10 @@ owners: pad (Nedki-L) <reviewer2@example.com>
 tag: workflow
 path: .github/workflows
 owners: ixd (kurisaW) <reviewer1@example.com>, pad (Nedki-L) <reviewer2@example.com>, mem (KurisaW-Collaborative) <reviewer3@example.com>
+
+tag: tools
+path: tools
+owners: ixd (hydevcode) <reviewer1@example.com>, pad (kurisaW) <reviewer2@example.com>
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Note: Each entry includes a `tag` that identifies the module or functionality, a `path` that points to the relevant code location,
