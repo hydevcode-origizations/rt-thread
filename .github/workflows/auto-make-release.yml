@@ -1,5 +1,5 @@
   #流程：
-  #1.获取当前已发布版本的时间
+
   #2.统计当前到上一个版本的pr做成描述
   #3.打包仓库
   #4.发布小版本
@@ -14,18 +14,25 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # 获取完整提交历史
-
+    # - name: Checkout Code
+    #   uses: actions/checkout@v4
+    #   with:
+    #     fetch-depth: 0  # 获取完整提交历史
+    #获取当前已发布版本
     - name: Get Previous Tag
       id: prev_tag
       run: |
         # 获取上一个发布的标签（排除预发布标签）
         PREV_TAG=$(git describe --tags --abbrev=0 --match "v*" HEAD^ 2>/dev/null || echo "")
         echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
-
+        echo "${PREV_TAG}"
+        if [[ ! "${PREV_TAG}" == "" ]]; then
+          last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
+          new_last_digit=$((last_digit + 1))
+          new_version=$(echo "$version" | sed "s/[0-9]\+$/$new_last_digit/")
+          echo "new_version=${new_version}" >> $GITHUB_OUTPUT
+          echo "${new_version}"
+        fi
     - name: Generate PR List
       id: pr_list
       if: ${{ steps.prev_tag.outputs.prev_tag != '' }}
@@ -42,9 +49,10 @@ jobs:
         # 将 PR 列表保存为变量
         PR_NOTES=$(cat pr_list.txt)
         echo "pr_notes=${PR_NOTES}" >> $GITHUB_OUTPUT
+        echo "${PR_NOTES}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    #2.统计当前到上一个版本的pr做成描述
     - name: Create Release Notes
       run: |
         # 生成版本描述文件
@@ -58,12 +66,12 @@ jobs:
 
         echo -e "$RELEASE_NOTES" > release_notes.md
 
-    - name: Publish Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ env.NEW_VERSION }}
-        name: ${{ env.NEW_VERSION }}
-        body_file: release_notes.md
-      env:
-        NEW_VERSION: v1.2.3  # 替换为你的版本生成逻辑
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Publish Release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     tag_name: ${{ env.NEW_VERSION }}
+    #     name: ${{ env.NEW_VERSION }}
+    #     body_file: release_notes.md
+    #   env:
+    #     NEW_VERSION: v1.2.3  # 替换为你的版本生成逻辑
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
