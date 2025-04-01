@@ -36,12 +36,14 @@ jobs:
           echo "${PREV_TIME}"
         fi
         echo "--------------------------------"
-        if [[ -z "$PREV_TAG" ]]; then
+        if [[ -n "$PREV_TAG" ]]; then
           last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
           new_last_digit=$((last_digit + 1))
-          new_version=$(echo "$version" | sed "s/[0-9]\+$/$new_last_digit/")
+          new_version=$(echo "$new_last_digit" | sed "s/[0-9]\+$/$new_last_digit/")
           echo "new_version=${new_version}" >> $GITHUB_OUTPUT
           echo "$new_version"
+        else
+          echo "没有找到上一个版本"
         fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,7 +58,7 @@ jobs:
           --state merged \
           --search "merged:>=${{steps.prev_tag.outputs.prev_time}}" \
           --json number,title,author,url \
-          --jq 'map("- [#\(.number)](\(.url)) \(.title) @\(.author.login)") | join("\n")' \
+          --jq 'map("- [#\(.number)](\(.url)) \(.title) \(.author.login)") | join("\n")' \
           > pr_list.txt
 
         # 将 PR 列表保存为变量
