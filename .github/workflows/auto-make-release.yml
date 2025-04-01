@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # 获取完整提交历史
-    #获取当前已发布版本
+
     - name: Get Previous Tag
       id: prev_tag
       run: |
@@ -26,6 +26,15 @@ jobs:
         PREV_TAG=$(git describe --tags --abbrev=0 --match "v*" HEAD^ 2>/dev/null || echo "")
         echo "prev_tag=${PREV_TAG}" >> $GITHUB_OUTPUT
         echo "${PREV_TAG}"
+        # 获取上一个版本的时间，如果有的话,没有就用基准时间
+        PREV_TIME=$(gh release list -L 1 --json publishedAt | jq '.[].publishedAt')
+        echo "prev_time=${PREV_TIME}" >> $GITHUB_OUTPUT
+        echo "${PREV_TIME}"
+        if [[ -n "$PREV_TIME" ]]; then
+          PREV_TIME="2025-04-01"
+          echo "${PREV_TIME}"
+        fi
+        echo "--------------------------------"
         if [[ -n "$PREV_TAG" ]]; then
           last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
           new_last_digit=$((last_digit + 1))
@@ -33,15 +42,17 @@ jobs:
           echo "new_version=${new_version}" >> $GITHUB_OUTPUT
           echo "$new_version"
         fi
+        
     - name: Generate PR List
       id: pr_list
       if: ${{ steps.prev_tag.outputs.prev_tag != '' }}
       run: |
         # 获取两个标签之间的 PR 列表（使用 GitHub CLI）
+        # 依靠的是上一个版本的时间
         gh pr list \
-          --base main \
+          --base master \
           --state merged \
-          --search "merged:>${{ steps.prev_tag.outputs.prev_tag }}" \
+          --search "merged:>=${{steps.prev_tag.outputs.prev_time}}" \
           --json number,title,author,url \
           --jq 'map("- [#\(.number)](\(.url)) \(.title) @\(.author.login)") | join("\n")' \
           > pr_list.txt
