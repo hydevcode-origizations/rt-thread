@@ -67,14 +67,13 @@ jobs:
           > pr_list.txt
 
         # 将 PR 列表保存为变量
-        cat pr_list.txt
         PR_NOTES=$(cat pr_list.txt)
 
         # 统计当前到上一个版本的pr做成描述
         RELEASE_NOTES="## ${{ steps.prev_tag.outputs.new_version }} ($(date -I))\n\n"
         if [ -n "$PR_NOTES" ]; then
           RELEASE_NOTES+="### Merged PRs since ${{ steps.prev_tag.outputs.prev_tag }}:\n"
-          RELEASE_NOTES+="\n$PR_NOTES\n"
+          RELEASE_NOTES+="$PR_NOTES\n"
         else
           RELEASE_NOTES+="No new PRs since last release.\n"
         fi
@@ -84,10 +83,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
+        body_path: release_notes.md
         tag_name: ${{ steps.prev_tag.outputs.new_version }}
-        name: RT-Thread ${{ env.NEW_VERSION }} released
-        body_file: release_notes.md
+        name: RT-Thread ${{ steps.prev_tag.outputs.new_version }} released
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
