@@ -42,7 +42,8 @@ jobs:
           echo "new_version=${new_version}" >> $GITHUB_OUTPUT
           echo "$new_version"
         fi
-        
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Generate PR List
       id: pr_list
       if: ${{ steps.prev_tag.outputs.prev_tag != '' }}
