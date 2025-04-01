@@ -42,7 +42,7 @@ jobs:
           last_digit=$(echo "${PREV_TAG}" | grep -oE '[0-9]+$')
           new_last_digit=$((last_digit + 1))
           echo "$new_last_digit"
-          new_version=$(echo "$PREV_TIME" | sed "s/[0-9]\+$/$new_last_digit/")
+          new_version=$(echo "$PREV_TAG" | sed "s/[0-9]\+$/$new_last_digit/")
           
           echo "$new_version"
         else
@@ -62,18 +62,19 @@ jobs:
           --base master \
           --state merged \
           --search "merged:>=${{steps.prev_tag.outputs.prev_time}}" \
-          --json number,title,author,url \
-          --jq 'map("- [#\(.number)](\(.url)) \(.title) \(.author.login)") | join("\n")' \
+          --json number,title,url \
+          --jq 'map("- [#\(.number)](\(.url)) \(.title)") | join("\n")' \
           > pr_list.txt
 
         # 将 PR 列表保存为变量
         cat pr_list.txt
         PR_NOTES=$(cat pr_list.txt)
 
+        # 统计当前到上一个版本的pr做成描述
         RELEASE_NOTES="## ${{ steps.prev_tag.outputs.new_version }} ($(date -I))\n\n"
         if [ -n "$PR_NOTES" ]; then
           RELEASE_NOTES+="### Merged PRs since ${{ steps.prev_tag.outputs.prev_tag }}:\n"
-          RELEASE_NOTES+="$PR_NOTES\n"
+          RELEASE_NOTES+="\n$PR_NOTES\n"
         else
           RELEASE_NOTES+="No new PRs since last release.\n"
         fi
@@ -82,26 +83,11 @@ jobs:
         echo "$RELEASE_NOTES"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #统计当前到上一个版本的pr做成描述
-    # - name: Create Release Notes
-    #   run: |
-    #     # 生成版本描述文件
-    #     RELEASE_NOTES="## ${{ env.NEW_VERSION }} ($(date -I))\n\n"
-    #     if [ -n "${{ steps.pr_list.outputs.pr_notes }}" ]; then
-    #       RELEASE_NOTES+="### Merged PRs since ${{ steps.prev_tag.outputs.prev_tag }}:\n"
-    #       RELEASE_NOTES+="${{ steps.pr_list.outputs.pr_notes }}\n"
-    #     else
-    #       RELEASE_NOTES+="No new PRs since last release.\n"
-    #     fi
-
-    #     echo -e "$RELEASE_NOTES" > release_notes.md
-    #     echo "$RELEASE_NOTES"
-    # - name: Publish Release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     tag_name: ${{ env.NEW_VERSION }}
-    #     name: ${{ env.NEW_VERSION }}
-    #     body_file: release_notes.md
-    #   env:
-    #     NEW_VERSION: v1.2.3  # 替换为你的版本生成逻辑
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.prev_tag.outputs.new_version }}
+        name: RT-Thread ${{ env.NEW_VERSION }} released
+        body_file: release_notes.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
