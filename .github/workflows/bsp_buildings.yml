@@ -49,10 +49,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@main
         with:
-          sparse-checkout: |
-            .github/ALL_BSP_COMPILE.json
-            tools/ci/git_diff_show.py
           persist-credentials: false
+          fetch-depth: 0
       # - name: Read matrix config
       #   id: read-config
       #   run: |
