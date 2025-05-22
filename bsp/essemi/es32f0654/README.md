@@ -13,7 +13,7 @@ ES-PDS-ES32F0654 是东软载波微电子官方推出的一款基于 ARM Cortex-
 
 开发板外观如下图所示：
 
-ES-PDS-ES32F0654-V1.1
+ES-PDS-ES32F0654-V1.1asdasasd
 
 ![ES32F0654](figures/ES-PDS-ES32F0654-V1.1.jpg)
 

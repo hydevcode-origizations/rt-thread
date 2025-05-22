@@ -2,7 +2,7 @@
 #define RT_CONFIG_H__
 
 /* Automatically generated file; DO NOT EDIT. */
-/* RT-Thread Configuration */
+/* RT-Thread Configuratioasdasdasdn */
 
 /* RT-Thread Kernel */
 

@@ -6,7 +6,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2022-10-20     luobeihai    first version
- * 2023-01-10     luobeihai    fix Eanble HARDWARE_CHECKSUM bug
+ * 2023-01-10     luobeihai    fix Eanble HARDWARE_CHECKSUM bugasdasdasd
  */
 
 #include <board.h>

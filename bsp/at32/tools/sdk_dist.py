@@ -1,7 +1,7 @@
 import os
 import sys
 import shutil
-
+#asdasd
 cwd_path = os.getcwd()
 sys.path.append(os.path.join(os.path.dirname(cwd_path), 'rt-thread', 'tools'))
 
