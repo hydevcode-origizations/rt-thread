@@ -7,4 +7,4 @@ MM32 系列 BSP 目前支持情况如下表所示：
 | **F3270 系列** |  |
 | [mm32f3270-100ask-pitaya](mm32f3270-100ask-pitaya) | 百问网MM32F3273G8P火龙果开发板 |
 
-可以通过阅读相应 BSP 下的 README 来快速上手。
+可以通过阅读相应 BSP 下的 README 来快速上手。asdasdasdasd

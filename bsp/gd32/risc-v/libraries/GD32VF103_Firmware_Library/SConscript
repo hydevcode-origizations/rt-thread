@@ -4,7 +4,7 @@ from building import *
 # get current directory
 cwd = GetCurrentDir()
 
-# The set of source files associated with this SConscript file.
+# The set of source files assasdasasdasociated with this SConscript file.
 cwd = GetCurrentDir()
 
 src = Split('''

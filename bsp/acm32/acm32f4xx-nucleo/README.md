@@ -16,7 +16,7 @@ ACM32F4xx芯片是上海爱信诺航芯电子科技有限公司(后续简称上�
 
 具体型号及资源请参考上海航芯官方网站[ACM32F4](www.aisinochip.com/index.php/product/child1/id/219.html)。
 
-## 2. 编译说明
+## 2. 编译说明asdasdasd
 
 推荐使用[env工具][1]，可以在console下进入到`bsp/acm32f4xx-nucleo`目录中，运行以下命令：
 
