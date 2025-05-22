@@ -6,13 +6,7 @@
 # Change Logs:
 # Date           Author       Notes
 # 2025-05-15     supperthomas add PR status show
-#
-
-# 流程:
-# 获取diff
-# 整理输出修改报告
-# 获取修改列表
-# 根据策略整理出需要编译的地方，并返回列表
+# 2025-05-22     hydevcode    替换bsp_building.yml的判断文件修改机制,并将PR status show合并进bsp_building.yml
 import subprocess
 import sys
 import os
@@ -23,8 +17,6 @@ from typing import List, Dict
 
 import json
 from typing import List
-import shutil
-import fnmatch
 class FileDiff:
     def __init__(self, path: str, status: str, size_change: int = 0, old_size: int = 0, new_size: int = 0):
         self.path = path
@@ -57,7 +49,7 @@ class GitDiffAnalyzer:
             sys.exit(1)
             
         # 获取差异文件列表
-        diff_cmd = f"git diff --name-status {merge_base}"
+        diff_cmd = f"git diff --name-status {merge_base} HEAD"
         print(diff_cmd)
         try:
             output = subprocess.check_output(diff_cmd.split(), stderr=subprocess.STDOUT)
@@ -68,10 +60,7 @@ class GitDiffAnalyzer:
             sys.exit(1)
             
         if not output:
-
-            # shutil.copy(".github/ALL_BSP_COMPILE.json", ".github/ALL_BSP_COMPILE_TEMP.json")
             print("No differences between current branch and target branch")
-
             sys.exit(0)
             
         # 处理可能的换行符问题
@@ -238,7 +227,6 @@ def filter_bsp_config(file_diffs: List[FileDiff], config_path: str):
 
 
 def main():
-
         # 源文件路径
     source_file = ".github/ALL_BSP_COMPILE.json"  # 替换为你的文件路径
 
