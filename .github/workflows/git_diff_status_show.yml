@@ -12,9 +12,7 @@ name: PR status
 
 # 这个ci主要用来显示当前的PR对于master节点上的增加的code size有多大
 on:
-  pull_request:
-    branches:
-      - master
+
 
 permissions:
   contents: read # to fetch code (actions/checkout)
