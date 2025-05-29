@@ -5,15 +5,11 @@ name: utest_auto_run
 
 on:
   push:
-    branches:
-      - master
     paths-ignore:
       - documentation/**
       - '**/README.md'
       - '**/README_zh.md'
   pull_request:
-    branches:
-      - master
     paths-ignore:
       - documentation/**
       - '**/README.md'
@@ -26,7 +22,6 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     name: ${{ matrix.platform.UTEST }} :${{ matrix.config_file }}
-    if: github.repository_owner == 'RT-Thread'
     strategy:
       fail-fast: false
       matrix:
