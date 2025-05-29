@@ -40,9 +40,10 @@ jobs:
 
         config_file:
           - "default.cfg"
-
-          # cpp11
-          # - "cpp11/cpp11.cfg"
+          - "kernel/kernel.cfg"
+          - "kernel/kernel_mem.cfg"
+          - "kernel/kernel_ipc.cfg"
+          - "cpp11/cpp11.cfg"
 
     env:
       TEST_QEMU_ARCH: ${{ matrix.platform.QEMU_ARCH }}
